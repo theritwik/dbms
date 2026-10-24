@@ -1,0 +1,591 @@
+An Entity-Relationship (ER) Model is a high-level, conceptual data modeling technique used in database design to graphically illustrate the structure of a database. It simplifies the representation of complex systems by outlining entities, their attributes, and the relationships between them. The ER model plays a critical role during the initial stages of designing a database system, ensuring that all necessary components and their interconnections are clearly defined before actual implementation.
+
+Definition
+Entity: An object or concept that can have data stored about it. For example, a "Student" or a "Course" in a university database.
+Attribute: A property or characteristic of an entity. For example, a "Student" entity might include attributes like StudentID, Name, and DateOfBirth.
+Relationship: The association between entities. For instance, a "Student" may enroll in one or more "Courses," which creates a relationship between these two entities.
+Core Mechanism
+Conceptual Representation: The ER model uses visual symbols to represent different components of the database:
+Rectangles typically denote entities.
+Ellipses indicate attributes.
+Diamonds represent relationships.
+Mapping to Database Schemas: Once the ER model is finalized, it can be translated into a relational database schema. This involves converting entity constructs into tables, attributes into columns, and relationships into foreign keys or associative tables.
+Normalization and Integrity: By identifying entities and their relationships clearly, the ER model helps in structuring the data to reduce redundancy and maintain data integrity.
+Real-World Analogy
+Imagine designing the blueprint for a building:
+
+Entities: Different floors in the building.
+Attributes: Features of each floor, like the number of rooms or the materials used.
+Relationships: The connections or corridors that link the floors together. Just as a well-drafted blueprint defines what the building will look like and how its components interact, an ER model provides a clear and organized overview of the data structure, ensuring efficient database design and implementation.
+Example of an ER Diagram Description
+Consider a simple university database with the following components:
+
+Entities:
+Student (attributes: StudentID, Name, Email)
+Course (attributes: CourseID, CourseName, Credits)
+Instructor (attributes: InstructorID, Name, Department)
+Relationships:
+Enrolls: a relationship between Student and Course.
+Teaches: a relationship between Instructor and Course.
+This ER model helps capture all necessary details before moving on to create tables and establish the database schema.
+
+Common Misconceptions
+Confusing ER Models with Relational Schemas: While the ER model is an abstract representation used during the design phase, a relational schema is a physical implementation of that design within a database.
+Overcomplicating the Diagram: Sometimes designers include too many details in an ER diagram. The focus should be on capturing only the critical entities, attributes, and relationships.
+Ignoring Relationship Nature: It’s a common mistake to not specify the nature of relationships (one-to-one, one-to-many, or many-to-many) which is crucial for accurately mapping the ER diagram to a relational schema.
+Key Takeaways
+The ER Model is essential for visualizing the data structure and planning the relationships between data entities before implementing a database.
+It provides a high-level view of the system, ensuring clarity and alignment among stakeholders during the design phase.
+Understanding and correctly applying the ER model leads to more efficient database design, reducing redundancies and maintaining data consistency.
+An ER model is an indispensable tool for database designers and architects, setting the foundation for robust, scalable, and maintainable database systems.
+
+Mapping ER Model to Relational Schema
+
+Mapping an Entity-Relationship (ER) model to a relational schema is a fundamental step in database design. It transforms the conceptual design (ER diagram) into a logical design (relational tables) that can be implemented in a Relational Database Management System (RDBMS).
+
+This guide covers the systematic process of converting various ER components — entities, attributes, relationships, and constraints — into relational tables.
+
+Core Concepts
+ER Model Component	Relational Schema Equivalent
+Entity	Relation (Table)
+Attribute	Attribute (Column)
+Relationship	Relation (Table or Foreign Key)
+Primary Key	Primary Key
+Weak Entity	Relation with Foreign Key + Partial Key
+Step-by-Step Mapping Rules
+1. Mapping Regular Entities
+For each regular entity in the ER diagram, create a relation (table).
+Include all simple attributes as columns.
+Choose the primary key (PK) of the entity as the primary key of the relation.
+Composite attributes are broken down into their simple components as individual columns.
+Multi-valued attributes are handled separately (see step 4).
+Example:
+
+Entity: Student(StudentID, Name, DOB)
+
+Relational Schema:
+
+StudentID (PK)	Name	DOB
+2. Mapping Weak Entities
+For each weak entity, create a relation.
+Include all simple attributes.
+Include the primary key of the owner entity as a foreign key (FK).
+The primary key of the weak entity relation is a combination of the owner entity's PK and the weak entity's partial key.
+Example:
+
+Weak Entity: Dependent(DependentName, DOB) owned by Employee(EmployeeID)
+
+Relational Schema:
+
+| EmployeeID (FK, part of PK) | DependentName (part of PK) | DOB |
+
+3. Mapping Binary 1:1 Relationships
+If one side is total participation, include the primary key of that entity as a foreign key in the other entity's relation.
+If both sides have total participation, you can merge the two entities into one relation or choose one side to hold the foreign key.
+Otherwise, create a separate relation with foreign keys referencing both entities.
+4. Mapping Binary 1:N Relationships
+Identify the entity on the "many" side.
+Add a foreign key in the "many" side relation referencing the primary key of the "one" side.
+Example:
+
+Department(DeptID, DeptName) and Employee(EmpID, Name, DeptID)
+
+Here, DeptID is a foreign key in Employee.
+
+5. Mapping Binary M:N Relationships
+Create a new relation to represent the relationship.
+Include the primary keys of both participating entities as foreign keys.
+The combination of these foreign keys forms the primary key of the new relation.
+Include any attributes of the relationship as columns.
+Example:
+
+Student(StudentID, Name) and Course(CourseID, Title) with relationship Enrolls(Grade)
+
+Relational Schema:
+
+| StudentID (FK, PK) | CourseID (FK, PK) | Grade |
+
+6. Mapping Multi-valued Attributes
+Create a new relation for the multi-valued attribute.
+Include the primary key of the owning entity as a foreign key.
+Include the multi-valued attribute as a column.
+The combination of the owning entity's primary key and the multi-valued attribute forms the primary key of this relation.
+Example:
+
+Entity: Employee(EmpID, Name) with multi-valued attribute PhoneNumbers
+
+Relation:
+
+| EmpID (FK, PK) | PhoneNumber (PK) |
+
+7. Mapping N-ary Relationships (n > 2)
+Create a new relation for the relationship.
+Include the primary keys of all participating entities as foreign keys.
+The combination of all these foreign keys forms the primary key.
+Include any attributes of the relationship as columns.
+Summary Table of Mapping Rules
+ER Component	Relational Schema Mapping
+Regular Entity	Relation with attributes, PK is entity PK
+Weak Entity	Relation with FK to owner + partial key as PK
+1:1 Relationship	FK in one relation or merged relation
+1:N Relationship	FK in "many" side relation
+M:N Relationship	New relation with FKs from both entities + attributes
+Multi-valued Attribute	New relation with FK + multi-valued attribute as PK
+N-ary Relationship	New relation with FKs from all entities + attributes
+Real-World Example
+Consider an ER model with:
+
+Entity: Student(StudentID, Name)
+Entity: Course(CourseID, Title)
+M:N Relationship: Enrolls with attribute Grade
+Relational Schema:
+
+Copy
+plaintext
+Student(StudentID PK, Name)
+Course(CourseID PK, Title)
+Enrolls(StudentID PK, FK, CourseID PK, FK, Grade)
+Additional Notes
+Always ensure referential integrity by defining foreign keys.
+Normalize relations to avoid redundancy.
+Handle composite keys carefully, especially in weak entities and many-to-many relations.
+Some DBMS support inheritance or subclassing; ER subtypes can be mapped using:
+One table per hierarchy
+One table per subtype
+One table per concrete class (choose based on use case)
+References for Further Reading
+Database System Concepts by Silberschatz, Korth, and Sudarshan (Chapter on ER to Relational Mapping)
+Fundamentals of Database Systems by Elmasri and Navathe
+W3Schools ER to Relational Model
+GeeksforGeeks: ER Model to Relational Model
+Summary
+Mapping ER models to relational schemas is a systematic process that ensures the conceptual design translates correctly into a logical database design. Following the above rules guarantees a normalized, consistent, and implementable relational schema.
+
+
+What are Functional Dependencies (FDs)?
+A Functional Dependency (FD) is a fundamental concept in the theory of relational databases, used to express constraints between attributes (columns) in a relation (table). It describes a relationship where the value of one set of attributes uniquely determines the value of another set of attributes.
+
+Formal Definition:
+Given a relation schema R and two sets of attributes X and Y (where both are subsets of attributes of R), Y is functionally dependent on X, denoted as:
+
+[ X \rightarrow Y ]
+
+if and only if for any two tuples ( t_1 ) and ( t_2 ) in any valid relation instance of R:
+
+[ \text{if } t_1[X] = t_2[X] \text{ then } t_1[Y] = t_2[Y] ]
+
+In other words, the values of attributes in X uniquely determine the values of attributes in Y.
+
+Key Concepts Related to Functional Dependencies
+1. Determinant
+The attribute set X on the left side of the FD (X \rightarrow Y) is called the determinant.
+It determines the values of Y.
+2. Trivial Functional Dependency
+An FD (X \rightarrow Y) is trivial if (Y \subseteq X).
+Example: ( {A, B} \rightarrow {A} ) is trivial because (A) is part of the determinant set.
+3. Non-Trivial Functional Dependency
+An FD is non-trivial if (Y \not\subseteq X).
+Example: (A \rightarrow B) where (B \notin A).
+4. Fully Functional Dependency
+(Y) is fully functionally dependent on (X) if it is functionally dependent on (X) but not on any proper subset of (X).
+Example: If (AB \rightarrow C) but neither (A \rightarrow C) nor (B \rightarrow C) holds, then (C) is fully functionally dependent on (AB).
+5. Partial Dependency
+If (Y) is functionally dependent on a proper subset of (X), then (Y) is partially dependent on (X).
+Why are Functional Dependencies Important?
+Normalization: FDs are the foundation for database normalization, which reduces redundancy and improves data integrity.
+Schema Design: They help in designing schemas that avoid anomalies (update, insert, delete anomalies).
+Query Optimization: Knowing FDs can help optimize queries by understanding attribute relationships.
+Armstrong's Axioms (Rules to Infer FDs)
+Armstrong's axioms are a sound and complete set of inference rules to derive all functional dependencies logically implied by a given set of FDs.
+
+Reflexivity:
+If (Y \subseteq X), then (X \rightarrow Y).
+
+Augmentation:
+If (X \rightarrow Y), then (XZ \rightarrow YZ) for any (Z).
+
+Transitivity:
+If (X \rightarrow Y) and (Y \rightarrow Z), then (X \rightarrow Z).
+
+Additional rules derived from Armstrong's axioms:
+
+Union: If (X \rightarrow Y) and (X \rightarrow Z), then (X \rightarrow YZ).
+Decomposition: If (X \rightarrow YZ), then (X \rightarrow Y) and (X \rightarrow Z).
+Pseudo-transitivity: If (X \rightarrow Y) and (WY \rightarrow Z), then (WX \rightarrow Z).
+Example of Functional Dependencies
+Consider a relation Student with attributes:
+
+StudentID	Name	Major	Advisor
+Possible FDs:
+
+( \text{StudentID} \rightarrow \text{Name, Major, Advisor} )
+(StudentID uniquely identifies the name, major, and advisor.)
+
+( \text{Name} \not\rightarrow \text{StudentID} )
+(Name alone may not uniquely identify a student.)
+
+( \text{Major} \rightarrow \text{Advisor} )
+(Each major has a unique advisor.)
+
+🧮 Computing Closure of Attributes (Attribute Closure)
+Attribute Closure of a set of attributes (X), denoted (X^+), is the set of all attributes functionally determined by (X) given a set of FDs.
+
+Algorithm to compute (X^+):
+Initialize (X^+ = X).
+For each FD (Y \rightarrow Z), if (Y \subseteq X^+), then add (Z) to (X^+).
+Repeat step 2 until no new attributes can be added.
+Python Code: Attribute Closure Computation
+Copy
+python
+from typing import Set, Dict, List, Tuple
+
+def attribute_closure(attributes: Set[str], fds: List[Tuple[Set[str], Set[str]]]) -> Set[str]:
+    """
+    Compute the closure of a set of attributes given functional dependencies.
+
+    Args:
+        attributes (Set[str]): The set of attributes to compute closure for.
+        fds (List[Tuple[Set[str], Set[str]]]): List of functional dependencies as tuples (X, Y),
+            where X and Y are sets of attributes.
+
+    Returns:
+        Set[str]: The closure of the input attribute set.
+    """
+    closure = set(attributes)
+    changed = True
+
+    while changed:
+        changed = False
+        for (lhs, rhs) in fds:
+            # If lhs is subset of closure, add rhs to closure
+            if lhs.issubset(closure) and not rhs.issubset(closure):
+                closure.update(rhs)
+                changed = True
+
+    return closure
+
+# Example usage:
+
+if __name__ == "__main__":
+    # Define functional dependencies for relation R(A,B,C,D)
+    # FDs: A -> B, B -> C, C -> D
+    fds_example = [
+        ({"A"}, {"B"}),
+        ({"B"}, {"C"}),
+        ({"C"}, {"D"}),
+    ]
+
+    attrs = {"A"}
+    closure = attribute_closure(attrs, fds_example)
+    print(f"Closure of {attrs} is {closure}")
+    # Output: Closure of {'A'} is {'A', 'B', 'C', 'D'}
+Practical Applications of Functional Dependencies
+Database Normalization:
+
+FDs help identify keys, candidate keys, and superkeys.
+Used to decompose tables into 2NF, 3NF, BCNF to avoid anomalies.
+Data Integrity Constraints:
+
+Enforce business rules (e.g., a student ID uniquely identifies a student).
+Query Optimization:
+
+Knowing FDs can reduce joins or redundant data retrieval.
+Common Misunderstandings and Mistakes
+Confusing functional dependency with multivalued dependency or inclusion dependency.
+Assuming FDs hold in all instances without verifying the data or schema constraints.
+Ignoring trivial FDs which are always true but not useful for normalization.
+Overlooking the importance of minimal cover (canonical cover) of FDs for efficient schema design.
+Summary
+Aspect	Description
+Definition	(X \rightarrow Y): X determines Y uniquely
+Key Usage	Database normalization and schema design
+Armstrong's Axioms	Reflexivity, Augmentation, Transitivity
+Attribute Closure	Set of attributes functionally determined by X
+Practical Importance	Avoid redundancy, ensure data integrity
+Further Reading and Resources
+Database System Concepts by Silberschatz, Korth, Sudarshan
+Functional Dependency - Wikipedia
+Stanford CS145: Functional Dependencies and Normalization
+Lecture Notes on Functional Dependencies (PDF)
+
+Definition and Core Understanding
+Normalization is a systematic process in database design aimed at organizing data to reduce redundancy and improve data integrity. It involves decomposing large tables into smaller, well-structured tables and defining relationships between them.
+
+The primary goal of normalization is to:
+
+Eliminate duplicate data (redundancy)
+Ensure data dependencies make sense (data integrity)
+Facilitate efficient data maintenance and updates
+Normalization is typically done through a series of normal forms (NFs), each with specific rules and constraints.
+
+Step-by-Step Explanation of Normal Forms
+1. First Normal Form (1NF)
+Rule: Each column must contain atomic (indivisible) values; no repeating groups or arrays.
+Effect: Ensures the table is a proper relation with unique rows and atomic columns.
+Example:
+
+StudentID	Courses
+1	Math, Physics
+Not 1NF because Courses has multiple values.
+
+Normalized to 1NF:
+
+StudentID	Course
+1	Math
+1	Physics
+2. Second Normal Form (2NF)
+Rule: Must be in 1NF, and every non-key attribute must be fully functionally dependent on the entire primary key.
+Effect: Eliminates partial dependency on a composite primary key.
+Example:
+
+StudentID	Course	Instructor
+1	Math	Dr. Smith
+If the primary key is (StudentID, Course), but Instructor depends only on Course, this violates 2NF.
+
+Normalized to 2NF:
+
+Table 1: Student-Course
+StudentID	Course
+1	Math
+Table 2: Course-Instructor
+Course	Instructor
+Math	Dr. Smith
+3. Third Normal Form (3NF)
+Rule: Must be in 2NF, and no transitive dependency exists (non-key attributes depend only on the primary key).
+Effect: Removes indirect dependencies.
+Example:
+
+StudentID	Course	Instructor	InstructorPhone
+1	Math	Dr. Smith	123-456-7890
+InstructorPhone depends on Instructor, not on the primary key (StudentID, Course).
+
+Normalized to 3NF:
+
+Table 1: Student-Course
+StudentID	Course
+1	Math
+Table 2: Course-Instructor
+Course	Instructor
+Math	Dr. Smith
+Table 3: Instructor-Phone
+Instructor	Phone
+Dr. Smith	123-456-7890
+Higher Normal Forms (Brief Overview)
+Boyce-Codd Normal Form (BCNF): Stronger version of 3NF, handling certain anomalies.
+Fourth Normal Form (4NF): Deals with multi-valued dependencies.
+Fifth Normal Form (5NF): Deals with join dependencies.
+Visual Diagram of Normalization Process
+Unnormalized Table
+       ↓ (1NF)
+Table with atomic columns, no repeating groups
+       ↓ (2NF)
+No partial dependencies on composite keys
+       ↓ (3NF)
+No transitive dependencies
+       ↓ (BCNF, 4NF, 5NF)
+Further refinement for complex dependencies
+🏢 Real-World Examples
+E-commerce database: Normalizing product, category, and supplier tables to avoid duplication of supplier info across products.
+University database: Splitting student, course, instructor, and enrollment data to maintain consistency.
+Banking systems: Ensuring customer and account data are stored without redundancy to prevent anomalies during updates.
+Code Snippet: Example of Normalization in SQL
+Copy
+sql
+-- Unnormalized table (single table with repeating groups)
+CREATE TABLE StudentCourses (
+    StudentID INT,
+    StudentName VARCHAR(100),
+    Courses VARCHAR(255) -- comma-separated courses (bad practice)
+);
+
+-- Normalized tables after 1NF and 2NF
+CREATE TABLE Students (
+    StudentID INT PRIMARY KEY,
+    StudentName VARCHAR(100)
+);
+
+CREATE TABLE Courses (
+    CourseID INT PRIMARY KEY,
+    CourseName VARCHAR(100)
+);
+
+CREATE TABLE Enrollments (
+    StudentID INT,
+    CourseID INT,
+    PRIMARY KEY (StudentID, CourseID),
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
+);
+Common Misunderstandings and Mistakes
+Over-normalization: Excessive normalization can lead to complex joins and performance hits.
+Ignoring practical needs: Sometimes denormalization is used intentionally for performance.
+Confusing normalization with indexing: Normalization is about structure; indexing is about query speed.
+Assuming normalization fixes all data issues: Proper constraints and validation are also necessary.
+Summary
+Normal Form	Key Rule	Purpose
+1NF	Atomic columns, no repeating groups	Eliminate multi-valued fields
+2NF	No partial dependency on composite keys	Eliminate partial dependencies
+3NF	No transitive dependencies	Eliminate indirect dependencies
+BCNF, 4NF, 5NF	Advanced dependency handling	Further anomaly prevention
+Further Reading & Resources
+Database Normalization Basics - Stanford
+Wikipedia: Database Normalization
+SQL Tutorial: Normalization
+
+Real-World Example: E-Commerce Schema
+
+Designing a robust and scalable database schema is crucial for any e-commerce platform. The schema must efficiently handle products, users, orders, payments, inventory, and more, while supporting complex queries and business logic.
+
+📋 Overview
+This example outlines a relational database schema for a typical e-commerce platform. It covers core entities, relationships, and key attributes to support common e-commerce functionalities like product catalog, user management, order processing, and payment tracking.
+
+E-Commerce Schema Design
+1. Core Entities and Their Purpose
+Entity	Description
+Users	Stores customer and admin user information
+Products	Catalog of items available for sale
+Categories	Product categorization for easier browsing
+Orders	Customer orders with status tracking
+OrderItems	Items within an order (many-to-one with Orders)
+Payments	Payment transactions related to orders
+Addresses	Shipping and billing addresses for users
+Inventory	Tracks stock levels for each product
+Reviews	Customer reviews and ratings for products
+Coupons	Discount codes and promotions
+2. Entity Relationship Diagram (ERD) - Simplified
+Copy
+plaintext
+Users 1---* Orders *---* OrderItems *---1 Products *---* Categories
+   |           |           |
+   |           |           *---1 Inventory
+   |           |
+   |           *---1 Payments
+   |
+   *---* Addresses
+3. Table Definitions and Key Fields
+Users
+Column	Type	Description
+user_id	UUID (PK)	Unique user identifier
+email	VARCHAR(255)	Unique email
+password_hash	VARCHAR(255)	Hashed password
+full_name	VARCHAR(255)	User's full name
+phone	VARCHAR(20)	Contact number
+created_at	TIMESTAMP	Account creation timestamp
+is_admin	BOOLEAN	Admin flag
+Products
+Column	Type	Description
+product_id	UUID (PK)	Unique product identifier
+name	VARCHAR(255)	Product name
+description	TEXT	Detailed description
+price	DECIMAL(10,2)	Price per unit
+category_id	UUID (FK)	Reference to product category
+created_at	TIMESTAMP	Product addition timestamp
+is_active	BOOLEAN	Product availability status
+Categories
+Column	Type	Description
+category_id	UUID (PK)	Unique category identifier
+name	VARCHAR(100)	Category name
+parent_id	UUID (FK)	Self-reference for subcategories (nullable)
+Orders
+Column	Type	Description
+order_id	UUID (PK)	Unique order identifier
+user_id	UUID (FK)	Customer who placed the order
+order_status	VARCHAR(50)	Status (e.g., pending, shipped)
+total_amount	DECIMAL(10,2)	Total order cost
+placed_at	TIMESTAMP	Order placement time
+shipping_address_id	UUID (FK)	Shipping address for the order
+OrderItems
+Column	Type	Description
+order_item_id	UUID (PK)	Unique order item identifier
+order_id	UUID (FK)	Associated order
+product_id	UUID (FK)	Product ordered
+quantity	INT	Quantity ordered
+price_at_order	DECIMAL(10,2)	Product price at order time
+Payments
+Column	Type	Description
+payment_id	UUID (PK)	Unique payment identifier
+order_id	UUID (FK)	Associated order
+payment_method	VARCHAR(50)	Method (e.g., credit card)
+amount	DECIMAL(10,2)	Amount paid
+payment_status	VARCHAR(50)	Status (e.g., completed)
+paid_at	TIMESTAMP	Payment timestamp
+Addresses
+Column	Type	Description
+address_id	UUID (PK)	Unique address identifier
+user_id	UUID (FK)	Owner of the address
+line1	VARCHAR(255)	Street address line 1
+line2	VARCHAR(255)	Street address line 2 (optional)
+city	VARCHAR(100)	City
+state	VARCHAR(100)	State/Province
+postal_code	VARCHAR(20)	ZIP/Postal code
+country	VARCHAR(100)	Country
+is_default	BOOLEAN	Default shipping address
+Inventory
+Column	Type	Description
+product_id	UUID (PK, FK)	Product identifier
+stock_quantity	INT	Number of units available
+last_updated	TIMESTAMP	Last stock update timestamp
+Reviews
+Column	Type	Description
+review_id	UUID (PK)	Unique review identifier
+product_id	UUID (FK)	Reviewed product
+user_id	UUID (FK)	Reviewer
+rating	INT	Rating (1-5)
+comment	TEXT	Review text
+created_at	TIMESTAMP	Review timestamp
+Coupons
+Column	Type	Description
+coupon_code	VARCHAR(50) PK	Unique coupon code
+discount_pct	INT	Discount percentage
+valid_from	DATE	Start date of validity
+valid_to	DATE	End date of validity
+max_uses	INT	Maximum number of uses
+times_used	INT	Number of times used
+Real-World Considerations
+UUIDs are used as primary keys for scalability and security.
+price_at_order in OrderItems preserves historical pricing.
+Inventory is separated to allow real-time stock updates without locking product data.
+Addresses linked to users allow multiple shipping/billing addresses.
+Coupons table supports promotions with usage limits.
+Reviews enable social proof and product feedback.
+Orders and Payments are decoupled to support multiple payment attempts or refunds.
+Indexes should be added on foreign keys and frequently queried columns (e.g., email, order_status).
+Example SQL DDL Snippet for Users and Products
+Copy
+sql
+CREATE TABLE Users (
+    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_admin BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE Categories (
+    category_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    parent_id UUID,
+    FOREIGN KEY (parent_id) REFERENCES Categories(category_id)
+);
+
+CREATE TABLE Products (
+    product_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    category_id UUID,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (category_id) REFERENCES Categories(category_id)
+);
+Summary
+This schema provides a solid foundation for an e-commerce platform supporting:
+
+User and admin management
+Product catalog with categories and inventory
+Order lifecycle with detailed items and payment tracking
+Customer reviews and promotional coupons
+Multiple addresses per user for shipping flexibility
+
