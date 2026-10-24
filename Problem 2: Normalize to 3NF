@@ -1,0 +1,199 @@
+Problem Overview
+Normalization is a database design technique that organizes tables to reduce redundancy and improve data integrity. The Third Normal Form (3NF) is a widely used normal form that ensures:
+
+The relation is in Second Normal Form (2NF).
+There are no transitive dependencies; i.e., non-prime attributes depend only on the primary key.
+Goal
+Given a relation schema with attributes and functional dependencies (FDs), normalize the relation into 3NF by decomposing it into smaller relations that satisfy 3NF conditions.
+
+Key Concepts and Definitions
+Functional Dependency (FD): X -> Y means attribute(s) X functionally determine attribute(s) Y.
+Prime Attribute: An attribute that is part of any candidate key.
+Transitive Dependency: A non-prime attribute depends on another non-prime attribute.
+3NF Condition: For every FD X -> A, at least one holds:
+X is a superkey, or
+A is a prime attribute.
+Step-by-Step Solution Outline
+Step 1: Identify Candidate Keys
+Find all candidate keys of the relation using the given FDs.
+Candidate keys are minimal attribute sets that functionally determine all attributes.
+Step 2: Check if Relation is in 2NF
+Ensure no partial dependency exists (no non-prime attribute depends on part of a candidate key).
+Step 3: Identify FDs violating 3NF
+For each FD X -> A, check if:
+X is a superkey, or
+A is prime.
+If neither, FD violates 3NF.
+Step 4: Decompose Relation into 3NF Relations
+For each FD violating 3NF, create a new relation with attributes X ∪ A.
+Ensure all candidate keys are preserved in some relation.
+Add a relation containing a candidate key if not already present.
+Step 5: Verify Lossless Join and Dependency Preservation
+The decomposition should be lossless (no data loss on join).
+All original FDs should be preserved in the decomposed relations.
+Example
+Given:
+
+Relation R(A, B, C, D)
+FDs: { A -> B, B -> C, A -> D }
+Candidate key: A (since A determines B, D and B determines C, so A transitively determines C)
+
+Check 3NF:
+A -> B: A is key → OK
+B -> C: B is not key, and C is non-prime → violates 3NF (transitive dependency)
+A -> D: A is key → OK
+Decompose:
+
+R1(B, C) with FD B -> C
+R2(A, B, D) with FDs A -> B, A -> D
+Python Implementation for 3NF Normalization
+This code takes:
+
+A set of attributes
+A set of functional dependencies
+Outputs relations normalized to 3NF
+Copy
+python
+from typing import Set, Tuple, List, Dict, FrozenSet
+
+class FunctionalDependency:
+    def __init__(self, lhs: Set[str], rhs: Set[str]):
+        self.lhs = lhs
+        self.rhs = rhs
+
+    def __repr__(self) -> str:
+        return f"{''.join(sorted(self.lhs))} -> {''.join(sorted(self.rhs))}"
+
+def closure(attributes: Set[str], fds: List[FunctionalDependency]) -> Set[str]:
+    """
+    Compute the closure of a set of attributes under given functional dependencies.
+    """
+    closure_set = set(attributes)
+    while True:
+        added = False
+        for fd in fds:
+            if fd.lhs.issubset(closure_set) and not fd.rhs.issubset(closure_set):
+                closure_set.update(fd.rhs)
+                added = True
+        if not added:
+            break
+    return closure_set
+
+def find_candidate_keys(attributes: Set[str], fds: List[FunctionalDependency]) -> List[Set[str]]:
+    """
+    Find all candidate keys for the relation.
+    """
+    def is_superkey(attr_set: Set[str]) -> bool:
+        return closure(attr_set, fds) == attributes
+
+    # Start with minimal keys - powerset approach (can be optimized)
+    from itertools import combinations
+
+    candidate_keys = []
+    attrs_list = list(attributes)
+    for r in range(1, len(attributes) + 1):
+        for subset in combinations(attrs_list, r):
+            subset_set = set(subset)
+            if is_superkey(subset_set):
+                # Check minimality
+                if not any(prev_key.issubset(subset_set) for prev_key in candidate_keys):
+                    candidate_keys.append(subset_set)
+    return candidate_keys
+
+def is_prime_attribute(attr: str, candidate_keys: List[Set[str]]) -> bool:
+    """
+    Check if attribute is prime (part of any candidate key).
+    """
+    return any(attr in key for key in candidate_keys)
+
+def decompose_to_3nf(attributes: Set[str], fds: List[FunctionalDependency]) -> List[Set[str]]:
+    """
+    Decompose relation into 3NF relations.
+    """
+    candidate_keys = find_candidate_keys(attributes, fds)
+    print(f"Candidate Keys: {candidate_keys}")
+
+    # Step 1: For each FD, check if it violates 3NF
+    relations = []
+    keys_included = set()
+
+    for fd in fds:
+        lhs_closure = closure(fd.lhs, fds)
+        # Check 3NF condition:
+        # FD X->A is in 3NF if X is superkey or A is prime attribute
+        lhs_is_superkey = lhs_closure == attributes
+        rhs_prime = all(is_prime_attribute(attr, candidate_keys) for attr in fd.rhs)
+
+        if lhs_is_superkey or rhs_prime:
+            # FD satisfies 3NF, include in relation later
+            continue
+        else:
+            # FD violates 3NF, create relation with lhs ∪ rhs
+            rel_attrs = fd.lhs.union(fd.rhs)
+            if rel_attrs not in relations:
+                relations.append(rel_attrs)
+
+    # Step 2: Add relation containing candidate key if not already included
+    # Pick first candidate key for simplicity
+    key_relation = candidate_keys[0]
+    if not any(key_relation.issubset(rel) for rel in relations):
+        relations.append(key_relation)
+
+    # Step 3: Add relations for FDs that satisfy 3NF but not covered yet
+    # (Optional: to preserve dependencies)
+    # For simplicity, add all FDs with lhs as superkey or rhs prime as separate relations if not covered
+    for fd in fds:
+        lhs_closure = closure(fd.lhs, fds)
+        lhs_is_superkey = lhs_closure == attributes
+        rhs_prime = all(is_prime_attribute(attr, candidate_keys) for attr in fd.rhs)
+        if lhs_is_superkey or rhs_prime:
+            rel_attrs = fd.lhs.union(fd.rhs)
+            if not any(rel_attrs.issubset(rel) for rel in relations):
+                relations.append(rel_attrs)
+
+    # Remove duplicates
+    unique_relations = []
+    for rel in relations:
+        if not any(rel == r for r in unique_relations):
+            unique_relations.append(rel)
+
+    return unique_relations
+
+def print_relations(relations: List[Set[str]]) -> None:
+    """
+    Nicely print the relations.
+    """
+    for i, rel in enumerate(relations, 1):
+        print(f"Relation R{i}: ({', '.join(sorted(rel))})")
+
+# Example usage:
+
+if __name__ == "__main__":
+    # Define attributes
+    attrs = {'A', 'B', 'C', 'D'}
+
+    # Define functional dependencies
+    fds = [
+        FunctionalDependency({'A'}, {'B'}),
+        FunctionalDependency({'B'}, {'C'}),
+        FunctionalDependency({'A'}, {'D'}),
+    ]
+
+    relations_3nf = decompose_to_3nf(attrs, fds)
+    print_relations(relations_3nf)
+Time and Space Complexity
+Finding candidate keys: Exponential in worst case due to powerset search (O(2^n)), but usually manageable for typical schema sizes.
+Closure computation: O(|FDs| * |attributes|) per closure.
+Decomposition: Linear in number of FDs.
+Edge Cases
+Relations with multiple candidate keys.
+FDs with composite keys on LHS.
+Attributes not appearing in any FD.
+Redundant FDs (should be minimized before normalization).
+Follow-up Problems
+Minimal Cover computation for FDs.
+Boyce-Codd Normal Form (BCNF) normalization.
+Dependency preservation and lossless join proofs.
+Automating normalization in database design tools.
+Summary
+This solution uses functional dependency analysis and candidate key identification to decompose a relation into 3NF relations, ensuring no transitive dependencies exist, preserving keys and dependencies where possible.
