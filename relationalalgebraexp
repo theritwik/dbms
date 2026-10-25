@@ -1,0 +1,111 @@
+-- Relational Algebra Example: Employee and Department Relations
+
+-- Suppose we have two relations (tables):
+
+-- Employee(EmpID, EmpName, DeptID, Salary)
+-- Department(DeptID, DeptName, Location)
+
+-- Sample Data:
+-- Employee:
+-- | EmpID | EmpName  | DeptID | Salary |
+-- |-------|----------|--------|--------|
+-- | 1     | Alice    | 10     | 70000  |
+-- | 2     | Bob      | 20     | 60000  |
+-- | 3     | Charlie  | 10     | 65000  |
+-- | 4     | David    | 30     | 55000  |
+
+-- Department:
+-- | DeptID | DeptName    | Location  |
+-- |--------|-------------|-----------|
+-- | 10     | HR          | New York  |
+-- | 20     | Engineering | San Jose  |
+-- | 30     | Marketing   | Chicago   |
+
+-- 1. Selection (σ): Find employees with salary > 60000
+
+σ_Salary > 60000(Employee)
+
+-- Result:
+-- | EmpID | EmpName | DeptID | Salary |
+-- |-------|---------|--------|--------|
+-- | 1     | Alice   | 10     | 70000  |
+-- | 3     | Charlie | 10     | 65000  |
+
+-- 2. Projection (π): Get only EmpName and Salary from Employee
+
+π_EmpName, Salary(Employee)
+
+-- Result:
+-- | EmpName | Salary |
+-- |---------|--------|
+-- | Alice   | 70000  |
+-- | Bob     | 60000  |
+-- | Charlie | 65000  |
+-- | David   | 55000  |
+
+-- 3. Join (⨝): Find employee names along with their department names
+
+Employee ⨝ Employee.DeptID = Department.DeptID Department
+
+-- Result:
+-- | EmpID | EmpName | DeptID | Salary | DeptID | DeptName    | Location  |
+-- |-------|---------|--------|--------|--------|-------------|-----------|
+-- | 1     | Alice   | 10     | 70000  | 10     | HR          | New York  |
+-- | 3     | Charlie | 10     | 65000  | 10     | HR          | New York  |
+-- | 2     | Bob     | 20     | 60000  | 20     | Engineering | San Jose  |
+-- | 4     | David   | 30     | 55000  | 30     | Marketing   | Chicago   |
+
+-- 4. Rename (ρ): Rename DeptName to DepartmentName in Department relation
+
+ρ_DepartmentName/DeptName(Department)
+
+-- Result:
+-- | DeptID | DepartmentName | Location  |
+-- |--------|----------------|-----------|
+-- | 10     | HR             | New York  |
+-- | 20     | Engineering    | San Jose  |
+-- | 30     | Marketing      | Chicago   |
+
+-- 5. Set Difference (-): Find employees who are NOT in Department 10 (HR)
+
+σ_DeptID ≠ 10(Employee)
+
+-- Result:
+-- | EmpID | EmpName | DeptID | Salary |
+-- |-------|---------|--------|--------|
+-- | 2     | Bob     | 20     | 60000  |
+-- | 4     | David   | 30     | 55000  |
+
+-- 6. Union (∪): Suppose we have two sets of employees from two different queries,
+-- find all employees who have salary > 60000 or belong to DeptID 30
+
+σ_Salary > 60000(Employee) ∪ σ_DeptID = 30(Employee)
+
+-- Result:
+-- | EmpID | EmpName | DeptID | Salary |
+-- |-------|---------|--------|--------|
+-- | 1     | Alice   | 10     | 70000  |
+-- | 3     | Charlie | 10     | 65000  |
+-- | 4     | David   | 30     | 55000  |
+
+-- 7. Intersection (∩): Find employees who have salary > 60000 AND belong to DeptID 10
+
+σ_Salary > 60000(Employee) ∩ σ_DeptID = 10(Employee)
+
+-- Result:
+-- | EmpID | EmpName | DeptID | Salary |
+-- |-------|---------|--------|--------|
+-- | 1     | Alice   | 10     | 70000  |
+-- | 3     | Charlie | 10     | 65000  |
+
+-- Summary:
+-- Relational Algebra operators used:
+-- σ (Selection), π (Projection), ⨝ (Join), ρ (Rename), ∪ (Union), - (Difference), ∩ (Intersection)
+Selection (σ) filters rows based on a condition.
+Projection (π) selects specific columns.
+Join (⨝) combines rows from two relations based on a common attribute.
+Rename (ρ) changes attribute names for clarity.
+Union (∪) combines tuples from two relations (duplicates removed).
+Difference (-) finds tuples in one relation but not in another.
+Intersection (∩) finds tuples common to both relations.
+This example demonstrates basic relational algebra operations on simple employee and department relations, which are foundational for querying relational databases.
